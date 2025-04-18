@@ -251,8 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 反復回数の変更
   iterationInput.addEventListener('change', () => {
     maxIterations = parseInt(iterationInput.value);
-    if (maxIterations < 10) maxIterations = 10;
-    if (maxIterations > 100000) maxIterations = 100000;
+    if (maxIterations < 1) maxIterations = 1;
+    if (maxIterations > 1000000) maxIterations = 1000000;
     iterationInput.value = maxIterations;
     drawMandelbrot();
   });
