@@ -10,10 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const coreCountDisplay = document.getElementById('core-count');
   const parallelModeCheckbox = document.getElementById('parallel-mode');
 
-  // キャンバスサイズの設定
-  canvas.width = 600;
-  canvas.height = 600;
-
   // マンデルブロ集合のパラメータ
   let centerX = -0.5;
   let centerY = 0;
@@ -71,6 +67,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // コア数表示を更新
   coreCountDisplay.textContent = parallelModeCheckbox.checked ? workerCount : 1;
+
+  // キャンバスサイズをレスポンシブに設定
+  function resizeCanvas() {
+    // レスポンシブなサイズを維持しつつ、内部描画サイズも調整
+    const displayWidth = canvas.clientWidth;
+    const displayHeight = canvas.clientHeight;
+    
+    // キャンバスの表示サイズと内部バッファサイズが異なる場合のみリサイズ
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+      canvas.width = displayWidth;
+      canvas.height = displayHeight;
+      // リサイズ後に再描画（初期化後に呼び出すため、ここでは直接呼び出さない）
+    }
+  }
 
   // 並列モード切り替え
   parallelModeCheckbox.addEventListener('change', () => {
@@ -267,26 +277,61 @@ document.addEventListener('DOMContentLoaded', () => {
     drawMandelbrot();
   });
 
-  // クリック位置を中心にする機能
-  canvas.addEventListener('click', (e) => {
-    // クリック位置をキャンバス座標から複素平面座標に変換
+  // 座標変換関数（クリック/タップ位置を複素平面座標に変換）
+  function convertToComplexCoord(clientX, clientY) {
+    // キャンバス上の相対位置を取得
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    
+    // キャンバスのピクセル座標から複素平面の座標に変換
     const xMin = centerX - 2.0 / zoom;
     const yMin = centerY - 2.0 / zoom;
     const dx = 4.0 / (zoom * canvas.width);
     const dy = 4.0 / (zoom * canvas.height);
     
-    // クリック位置を新しい中心座標に設定
-    centerX = xMin + e.offsetX * dx;
-    centerY = yMin + e.offsetY * dy;
-    
-    // 新しい中心座標で再描画
+    // 新しい中心座標を返す
+    return {
+      x: xMin + x * dx,
+      y: yMin + y * dy
+    };
+  }
+
+  // クリック位置を中心にする機能（マウス用）
+  canvas.addEventListener('click', (e) => {
+    const newCenter = convertToComplexCoord(e.clientX, e.clientY);
+    centerX = newCenter.x;
+    centerY = newCenter.y;
     drawMandelbrot();
   });
+
+  // タッチ位置を中心にする機能（タッチスクリーン用）
+  canvas.addEventListener('touchstart', (e) => {
+    // タッチイベントが他のイベントに干渉しないように
+    e.preventDefault();
+    
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const newCenter = convertToComplexCoord(touch.clientX, touch.clientY);
+      centerX = newCenter.x;
+      centerY = newCenter.y;
+      drawMandelbrot();
+    }
+  }, { passive: false });
 
   // 初期化とWorkerの準備
   if (parallelModeCheckbox.checked) {
     initWorkers();
   }
+
+  // 初期サイズを設定してから描画を行う
+  resizeCanvas();
+  
+  // ウィンドウリサイズ時にキャンバスサイズを調整
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    drawMandelbrot();
+  });
   
   // 初期描画
   drawMandelbrot();
