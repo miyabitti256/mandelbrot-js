@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mandelbrot set</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      width: 600px;
+      height: 600px;
+      border: 1px solid #000;
+    }
+
+    .controls {
+      display: flex;
+      margin-top: 10px;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-switch {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .render-stats {
+      margin-top: 5px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="controls">
+    <label for="zoom">拡大率</label>
+    <div><span id="zoom">1</span>倍</div>
+    <button id="zoomIn">+</button>
+    <button id="zoomOut">-</button>
+    <label for="iteration">反復回数</label>
+    <input type="number" id="iteration" value="100" placeholder="反復回数">
+    <button id="reset">リセット</button>
+  </div>
+  <div class="mode-switch">
+    <label><input type="checkbox" id="parallel-mode" checked> 並列処理モード（WebWorker使用）</label>
+  </div>
+  <div class="render-stats">
+    <div>レンダリング時間: <span id="render-time">0</span> ms</div>
+    <div>使用コア数: <span id="core-count">0</span></div>
+  </div>
+  <script src="main.js"></script>
+</body>
+
+</html>
