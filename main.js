@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   iterationInput.addEventListener('change', () => {
     maxIterations = parseInt(iterationInput.value);
     if (maxIterations < 10) maxIterations = 10;
-    if (maxIterations > 1000000) maxIterations = 1000000;
+    if (maxIterations > 10000) maxIterations = 10000;
     iterationInput.value = maxIterations;
     drawMandelbrot();
   });
